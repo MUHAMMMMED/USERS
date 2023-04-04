@@ -1,0 +1,26 @@
+<h1  style=" text-align: center; color: blue">Welcome</h1>
+
+{% if user.is_authenticated%}
+<h1  style=" text-align: center; color: blue"> hello {{ user.username }} your role </h1>
+<a href="{% url 'accounts:logout' %}"><h1 style=" text-align: center; color: red">Logout</h1></a> <br>
+
+{% else %}
+ <a href="{% url 'accounts:employeeRegister' %}"><h1 style=" text-align: center; color: blue">employee</h1> </a> <br> 
+<a href="{% url 'accounts:customerRegister' %}"><h1 style=" text-align: center; color: blue">customer</h1></a> <br>
+ <a href="{% url 'accounts:CallCenterRegister' %}"><h1 style=" text-align: center; color: blue">CallCenter</h1></a> <br>
+
+<a href="{% url 'accounts:ManagerRegister' %}"><h1 style=" text-align: center; color: blue">Manager</h1> </a> <br>
+<a href="{% url 'accounts:AdminRegister' %}"><h1 style=" text-align: center; color: blue">Admin</h1></a> <br>
+<a href="{% url 'accounts:MarketingRegister' %}"><h1 style=" text-align: center; color: blue">Marketing</h1></a> <br>
+<a href="{% url 'accounts:CallCenterManagerRegister' %}"><h1 style=" text-align: center; color: blue">CallCenterManager</h1> </a> <br>
+<a href="{% url 'accounts:PatientManagerregister' %}"><h1 style=" text-align: center; color: blue">Patient</h1></a> <br>  
+  <a href="{% url 'accounts:DoctorRegister' %}"><h1 style=" text-align: center; color: blue">Doctor</h1></a> <br> 
+
+ 
+
+
+
+
+<a href="{% url 'accounts:login' %}"><h1 style=" text-align: center; color: red">Login</h1></a> 
+{% endif %}
+

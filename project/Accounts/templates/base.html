@@ -1,0 +1,143 @@
+ 
+ 
+{% load static %}
+<!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <title> TARGT CALL CENTER </title>
+ 
+        
+        <!-- Meta -->
+ 
+        <!-- Favicon icon -->
+        <link rel="icon" href="{% static 'images/favicon.ico'%}"  type="image/x-icon">
+      <link rel="stylesheet" href="{% static 'css/style-admin.css' %}">   
+     
+     <link rel="stylesheet" href="{% static 'css/admin.css' %}"> 
+      
+       <!-- vendor css -->
+    
+  
+      </head>
+          
+      <style>
+   
+        .maincontainer {
+            background: #ecf0f5;
+             position: relative; 
+             margin: 0 auto; 
+            padding-top: 0;
+            display: block;
+            clear: both; 
+             float: unset; 
+             right: 0; 
+             top: 0; 
+        
+            min-height: 100vh;
+            transition: all 0.3s ease-in-out;}
+
+
+            .scroller {
+                width: 100%;
+                height: 430px;
+                overflow-y: scroll;
+                scrollbar-color: rebeccapurple green;
+                scrollbar-width: thin;}
+              
+                .floatt{
+                    position:fixed;
+                    width:60px;
+                    height:60px;
+                    bottom:40px;
+                    right:40px;
+                    background-color:#4680ff;
+                    color:#FFF;
+                    border-radius:50px;
+                    text-align:center;
+                  font-size:30px;
+                    box-shadow: 2px 2px 3px #999;
+                  z-index:100;
+                }.floatt:hover { 
+                  color:#4680ff;
+                  background-color:#FFF;
+                }
+                
+            
+
+        </style>
+        <!-- [ navigation menu ] end -->  
+        <!-- [ Header ] start -->
+        <header class="navbar pcoded-header navbar-expand-lg navbar-light header-blue">
+          
+            
+           
+              <div class="collapse navbar-collapse">
+          
+                <ul class="navbar-nav ml-auto">
+           
+                  <li>
+                    <div class="dropdown drp-user">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="feather icon-user"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right profile-notification">
+                        <div class="pro-head">
+                          {% comment %} <img src="{% static 'images/successfully.webp'%}" class="img-radius" alt="User-Profile-Image">
+                          <span>John Doe</span>
+                          <a href="{% url 'logout' %}" class="dud-logout" title="Logout">
+                            <i class="feather icon-log-out"></i>
+                          </a> {% endcomment %}
+                        </div>
+                        <ul class="pro-body"> 
+ {% if not request.user.is_authenticated %}
+ <li ><a href="/"class="dropdown-item"> <i class="feather icon-sidebar"></i>الصفحة الرئيسية</a></li>   
+<li ><a href="{% url 'login' %}" class="dropdown-item"><i class="feather icon-log-out m-r-5"></i>تسجيل الدخول </a></li>
+{% comment %} <li ><a href="{% url 'accounts:signup' %}"class="dropdown-item"><i class="feather icon-log-out m-r-5"></i>
+  إنشاء حساب</a></li> {% endcomment %}
+                          {% else %}
+{% comment %} <li><a href="{% url 'accounts:profile' %}" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li> {% endcomment %}
+<li ><a href="{% url 'TARGt:TARGthome' %}"class="dropdown-item"> <i class="feather icon-sidebar"></i>الصفحة الرئيسية</a></li>  
+{% comment %} <li ><a href="{% url 'accounts:signup' %}"class="dropdown-item"> <i class="feather icon-file-text"></i>الصفحة الرئيسية</a></li> {% endcomment %}
+<li ><a href="{% url 'TARGt:Analysis' %}"class="dropdown-item"><i class="feather icon-pie-chart"></i>التقارير</a></li>
+  {% comment %} <li><a href="email_inbox.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>  
+<li><a href="auth-signin.html" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>    {% endcomment %}
+ <li ><a href="{% url 'TARGt:datawarehouse' %}"class="dropdown-item">  <i class="feather icon-box"></i>مستودع البيانات</a></li>
+{% comment %} <li ><a href="{% url 'accounts:signup' %}"class="dropdown-item">  <i class="icon feather icon-bell"></i>Dashboard</a></li>
+<li ><a href="#!" class="dropdown-item"><i class="feather icon-settings m-r-5"></i>Settings</a></li>    {% endcomment %}
+<li ><a href="{% url 'logout' %}" class="dropdown-item"><i class="feather icon-log-out m-r-5"></i>تسجيل خروج</a></li>                          
+                          {% endif %}
+                          
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              
+            
+        </header>
+  <!-- [ Header ] end -->  
+
+        {% block content %}
+
+
+        {% endblock %}
+
+ 
+ <!-- Required Js -->  
+ <script src="{% static 'js/vendor-all.min.js' %}" type="text/javascript"></script>  
+<script src="{% static 'js/plugins/bootstrap.min.js' %}" type="text/javascript"></script>  
+{% comment %} <script src="{% static 'js/ripple.js' %}" type="text/javascript"></script>   {% endcomment %}
+ {% comment %} <script src="{% static 'js/pcoded0.min.js' %}" type="text/javascript"></script>   {% endcomment %}
+
+ 
+    </body>
+    </html>
+
+
+    
+ 
+
+
+
