@@ -7,65 +7,6 @@ from django.contrib.auth.models import User
 # from django.contrib.auth.signals import user_logged_in
 # from django.utils import  timezone
  
-
-
-
-# def update_last_login(sender, user, **kwargs):
-#     """
-#     A signal receiver which updates the last_login date for
-#     the user logging in.
-#     """
-#     user.last_login = timezone.now()
-#     user.save(update_fields=['last_login'])
-# user_logged_in.connect(update_last_login)
-
-
-
-
-
- 
-
-
-# class User(AbstractUser):
-#     is_admin = models.BooleanField(default=False)
-#     is_manager= models.BooleanField(default=False)
-#     is_CallCenter_manager= models.BooleanField(default=False)
-#     is_marketing= models.BooleanField(default=False)
-#     is_CallCenter= models.BooleanField(default=False)
-#     is_patient = models.BooleanField(default=False)
-#     is_doctor = models.BooleanField(default=False)
-#     is_customer= models.BooleanField(default=False)
-#     is_employee = models.BooleanField(default=False)
-#     is_active = models.BooleanField(default=True)
-    
-#     first_name = models.CharField(max_length=100)
-#     last_name = models.CharField(max_length=100)
-#     phone_number = models.CharField(max_length=20)
-#     email = models.EmailField(verbose_name="email", max_length=60)
-    # location = models.CharField(max_length=20)
-    # name = models.CharField(max_length=100)
-    # date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
-    # last_login = models.DateTimeField(verbose_name='last_login', auto_now=True)      
-
-
-
-  #  USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = ['name']
-#     objects = MyAccountManager()
-
-#     def __str__(self):
-#         return self.email  
-          
- 
-
-
- 
- 
-          
-          
-
-   
-   
    
    
 
@@ -174,14 +115,7 @@ class CustomUser(AbstractBaseUser):
            return self.is_admin
    
    
-   
-   
-   
-   
-   
-   
-   
-   
+    
    
 class Admin(models.Model):
     
