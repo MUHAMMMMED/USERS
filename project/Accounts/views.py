@@ -1,153 +1,487 @@
+from django.contrib.auth import login, logout,authenticate
 from django.shortcuts import redirect, render
-from .forms import SignupForm , UserForm , ProfileForm
-from django.contrib.auth import authenticate, login
-from .models import Profile
-from django.urls import reverse
+from django.contrib import messages
+from django.views.generic import CreateView
+from .form import  *
+from django.contrib.auth.forms import AuthenticationForm
+ 
+from .models import*
+
+def register(request):
+    return render(request, '../templates/register.html')
+
+def home(request):
+    return render(request, '../templates/Customer.html')
+
+def CallCentermanager(request):
+    return render(request, '../templates/CallCenter_manager.html')
+
+def Callcenter(request):
+    return render(request, '../templates/CallCenter.html')
+
+def doctor(request):
+    return render(request, '../templates/Doctor.html')
+
+def manager(request):
+    return render(request, '../templates/Manager.html')
+
+def marketing(request):
+    return render(request, '../templates/Marketing.html')
+
+def patient(request):
+    return render(request, '../templates/Patient.html')
+
+def employee(request):
+    return render(request, '../templates/employee.html')
+ 
+def customer(request):
+    return render(request, '../templates/Customer.html')
+ 
+ 
+ 
+ 
+ 
+# def home_view(request):
+    
+#     if request.user.is_authenticated:
+#         if request.user.is_admin:
+#             return redirect('accounts:manager')
+#         elif request.user.is_employee:
+#             return redirect('accounts:manager')
+#         elif request.user.is_manager:
+#             return redirect('accounts:manager')
+#         elif request.user.is_callcentermanager:
+#             return redirect('accounts:manager')
+#         elif request.user.is_customer:
+#             return redirect('accounts:manager')
+#         elif request.user.is_callCenter:
+#             return redirect('accounts:manager')
+#         elif request.user.is_marketing:
+#             return redirect('accounts:manager')
+#         elif request.user.is_doctor:
+#             return redirect('accounts:manager')
+#         elif request.user.is_patient:
+#             return redirect('accounts:manager')
+#     else:
+#         return render(request, '../templates/login.html')
+ 
 
 
-# Create your views here.
+ 
+ 
 
-
-def signup(request):
-    if request.method=="POST":
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            user = authenticate(username=username,password=password)
-            login(request,user)
-            return redirect('profile/')
-    else:
-        form = SignupForm()
-    return render(request,'registration/signup.html',{'form':form})
-
-
-
-
-def profile(request):
-    profile = Profile.objects.get(user=request.user)
-    return render(request,'accounts/profile.html',{'profile': profile})
-
-
-
-def profile_edit(request):
-    profile = Profile.objects.get(user=request.user)
-
+def login_request(request):
     if request.method=='POST':
-        userform = UserForm(request.POST,instance=request.user)
-        profileform = ProfileForm(request.POST,request.FILES,instance=profile )
-        if userform.is_valid() and profileform.is_valid():
-            userform.save()
-            myprofile = profileform.save(commit=False)
-            myprofile.user = request.user
-            myprofile.save()
-            return redirect(reverse('accounts:profile'))
-
-    else :
-        userform = UserForm(instance=request.user)
-        profileform = ProfileForm(instance=profile)
-
-    return render(request,'accounts/profile_edit.html',{'userform':userform , 'profileform':profileform})
-
-
-
-# def password_reset_request(request):
-# 	if request.method == "POST":
-# 		password_reset_form = PasswordResetForm(request.POST)
-# 		if password_reset_form.is_valid():
-# 			data = password_reset_form.cleaned_data['email']
-# 			associated_users = User.objects.filter(Q(email=data))
-# 			if associated_users.exists():
-# 				for user in associated_users:
-# 					subject = "Password Reset Requested"
-# 					email_template_name = "main/password/password_reset_email.txt"
-# 					c = {
-# 					"email":user.email,
-# 					'domain':'127.0.0.1:8000',
-# 					'site_name': 'Website',
-# 					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
-# 					'token': default_token_generator.make_token(user),
-# 					'protocol': 'http',
-# 					}
-# 					email = render_to_string(email_template_name, c)
-# 					try:
-# 						send_mail(subject, email, 'admin@example.com' , [user.email], fail_silently=False)
-# 					except BadHeaderError:
-
-# 						return HttpResponse('Invalid header found.')
-						
-# 					messages.success(request, 'A message with reset password instructions has been sent to your inbox.')
-# 					return redirect ("main:homepage")
-# 	password_reset_form = PasswordResetForm()
-# 	return render(request=request, template_name="main/password/password_reset.html", context={"password_reset_form":password_reset_form})
-# from django.shortcuts import render,redirect
-# from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.models import User
-# from django.contrib import messages
-# from .models import *
-# from django.contrib.auth import authenticate,login,logout
-# from .helpers import send_forget_password_mail
-
-
-# def ChangePassword(request , token):
-#     context = {}
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
     
     
-#     try:
-#         profile_obj = Profile.objects.filter(forget_password_token = token).first()
-#         context = {'user_id' : profile_obj.user.id}
-        
-#         if request.method == 'POST':
-#             new_password = request.POST.get('new_password')
-#             confirm_password = request.POST.get('reconfirm_password')
-#             user_id = request.POST.get('user_id')
+    # if request.method == 'POST':
+    #     form = LoginForm(request.POST)
+    #     if form.is_valid():
+    #         email = form.cleaned_data['email']
+    #         password = form.cleaned_data['password']
+    #         user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                role_urls = {
+                    'EMPLOYEE': 'accounts:employee',
+                    'CUSTOMER':  'accounts:customer',
+                    'MANAGER':  'accounts:manager',
+                    'CALLCENTERMANAGER': 'accounts:callcentermanager',
+                    'CALLCENTER': 'accounts:callcenter',
+                    'MARKETING': 'accounts:marketing',
+                    'DOCTOR': 'accounts:doctor',
+                    'PATIENT': 'accounts:patient',
+                }
+                return redirect(role_urls.get(user.role))
+            else:
+                form.add_error(None, 'Invalid email or password.')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+# def login_request(request):
+#     if request.user.is_authenticated:
+#         return redirect('accounts:manager')
+    
+#     if request.method == 'POST':
+#         email = request.POST['email']
+#         password = request.POST['password']
+#         user = authenticate(request, email=email, password=password)
+
+#         if user is not None:
+#             login(request, user)
+#             role_urls = {
+#                 # 'ADMIN': '/',
+#                 'EMPLOYEE': 'accounts:employee',
+#                 'CUSTOMER':  'accounts:customer',
+#                 'MANAGER':  'accounts:manager',
+#                 'CALLCENTERMANAGER': 'accounts:CallCentermanager',
+#                 'CALLCENTER': 'accounts:Callcenter',
+#                 'MARKETING':'accounts:marketing',
+#                 'DOCTOR': 'accounts:doctor',
+#                 'PATIENT': 'accounts:patient',
+#             }
+#             return redirect(role_urls.get(user.role))
+#         else:
+#             messages.error(request, 'Invalid username or password')
+
+#     return render(request, '../templates/login.html')
+
+ 
+# def login_view(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             email = form.cleaned_data['email']
+#             password = form.cleaned_data['password']
+#             user = authenticate(request, email=email, password=password)
+#             if user.role == "MANAGER":
+#                 login(request, user)
+#                 return redirect('/')
+
+
+#             elif user.role == "EMPLOYEE":
             
-#             if user_id is  None:
-#                 messages.success(request, 'No user id found.')
-#                 return redirect(f'/change-password/{token}/')
+ 
+#                 login(request,user)
+#                 return redirect('/')
+            
+            
+            
+#             else:
+#                 form.add_error(None, 'Invalid email or password.')
+#     else:
+#         form = LoginForm()
+#     return render(request, 'login.html', {'form': form})
+ 
+# from django.contrib.auth import authenticate, login
+ 
+
+# def login_request(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+#         user = authenticate(request, email=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             if user.is_admin():
+#                 return redirect('admin_home')
+#             elif user.is_employee():
+#                 return redirect( 'accounts:employee')
+#             elif user.is_manager():
+#                 return redirect('accounts:manager')
+#             # Add more elif statements for each role's home page
+#             else:
+#                 # Handle any other roles
+#                 pass
+#     return render(request, 'login.html')
+
+
+
+
+# def login_request(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+ 
+#             if user.role == "MANAGER":
+
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "EMPLOYEE":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+    
+#             elif user.role == "CUSTOMER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
                 
+#             elif user.role == "CALLCENTERMANAGER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
             
-#             if  new_password != confirm_password:
-#                 messages.success(request, 'both should  be equal.')
-#                 return redirect(f'/change-password/{token}/')
-                         
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')  
             
-#             user_obj = User.objects.get(id = user_id)
-#             user_obj.set_password(new_password)
-#             user_obj.save()
-#             return redirect('/login/')
+#             elif user.role == "CALLCENTER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
             
-            
-            
-        
-        
-#     except Exception as e:
-#         print(e)
-#     return render(request , 'change-password.html' , context)
-
-
-# import uuid
-# def ForgetPassword(request):
-#     try:
-#         if request.method == 'POST':
-#             username = request.POST.get('username')
-            
-#             if not User.objects.filter(username=username).first():
-#                 messages.success(request, 'Not user found with this username.')
-#                 return redirect('/forget-password/')
-            
-#             user_obj = User.objects.get(username = username)
-#             token = str(uuid.uuid4())
-#             profile_obj= Profile.objects.get(user = user_obj)
-#             profile_obj.forget_password_token = token
-#             profile_obj.save()
-#             send_forget_password_mail(user_obj.email , token)
-#             messages.success(request, 'An email is sent.')
-#             return redirect('/forget-password/')
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
                 
+#             elif user.role == "MARKETING":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "DOCTOR":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "PATIENT":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+            
+#         else:
+#             messages.error(request, "Invalid username or password")
+#     return render(request, '../templates/login.html', context={'form': AuthenticationForm()})
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+# def login_request(request):
+#     if request.method=='POST':
+#         form = AuthenticationForm(data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+            
+#             user = User.objects.get(id=request.user.id)
+
+#             if user.role == "MANAGER":
+
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "EMPLOYEE":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
     
+#             elif user.role == "CUSTOMER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+                
+#             elif user.role == "CALLCENTERMANAGER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')  
+            
+#             elif user.role == "CALLCENTER":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+                
+#             elif user.role == "MARKETING":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "DOCTOR":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+            
+#             elif user.role == "PATIENT":
+#         #    elif request.session.role is "Agent":
+#             # elid request.user.type == :
+            
+#             # if user is not None :
+#                 login(request,user)
+#                 return redirect('/')
+   
+#         else:
+#                 messages.error(request,"Invalid username or password")
+#     return render(request, '../templates/login.html',
+#     context={'form':AuthenticationForm()})
+
+
+# def login_request(request):
+#     if request.method=='POST':
+#         form = AuthenticationForm(data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+            
+            
+            
+            
+#             if user is not None :
+#                 login(request,user)
+#                 return redirect('accounts:home')
+#             else:
+#                 messages.error(request,"Invalid username or password")
+                
+                
+                
+#         else:
+#                 messages.error(request,"Invalid username or password")
+                
+#     return render(request, '../templates/login.html',context={'form':AuthenticationForm()})
+  
+
+
+
+
+
+
+
+
+
+     
+class customer_register(CreateView):
+    model = User
+    form_class = CustomerSignUpForm
+    template_name = '../templates/customer_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:customer')
+
+
+
+
+
+class employee_register(CreateView):
+    model = User
+    form_class = EmployeeSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:employee')
+
+
     
-#     except Exception as e:
-#         print(e)
-#     return render(request , 'forget-password.html')
+class CallCenter_register(CreateView):
+    model = User
+    form_class = CallCenterSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:Callcenter')
+    
+class Manager_register(CreateView):
+    model = User
+    form_class = ManagerSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:manager')
+
+
+     
+
+# class Admin_register(CreateView):
+#     model = User
+#     form_class = AdminSignUpForm
+#     template_name = '../templates/employee_register.html'
+
+#     def form_valid(self, form):
+#         user = form.save()
+#         login(self.request, user)
+#         return redirect('/')
+
+class Marketing_register(CreateView):
+    model = User
+    form_class = MarketingSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:marketing')
+
+class CallCenter_manager_register(CreateView):
+    model = User
+    form_class = CallCenter_managerSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:CallCentermanager')
+class Patient_register(CreateView):
+    model = User
+    form_class = PatientSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:patient') 
+    
+     
+class Doctor_register(CreateView):
+    model = User
+    form_class = DoctorSignUpForm
+    template_name = '../templates/employee_register.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('accounts:doctor')  
+    
+ 
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+

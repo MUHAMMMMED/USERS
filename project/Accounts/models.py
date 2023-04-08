@@ -1,354 +1,205 @@
+   
 from django.db import models
-from django.utils import timezone
-# Create your models here.
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.contrib.auth.models import User
-# from django.contrib.auth.signals import user_logged_in
-# from django.utils import  timezone
+
+
+# Create your models here.
+
+#  AbstractUser for authenticated
+class User(AbstractUser):
  
-   
-   
+    class Role(models.TextChoices):
+        ADMIN = "ADMIN", 'admin'
+        EMPLOYEE = "EMPLOYEE", "employee"
+        # DELIVERY = "DELIVERY", "delivery"
+        MANAGER = "MANAGER", "manager"
+        CUSTOMER = "CUSTOMER", "customer"
+        CALLCENTER = "CALLCENTER", "callCenter"    
+        MARKETING = "MARKETING", "marketing"
+        DOCTOR = "DOCTOR", "doctor"
+        PATIENT = "PATIENT", "patient"
+        CALLCENTERMANAGER = "CALLCENTERMANAGER", "callcentermanager"   
+        
+        
+    role = models.CharField(max_length=50, help_text='This is role user in system', choices=Role.choices)
+    email = models.EmailField(unique=True)
+    carrier_company_name = models.CharField(max_length=50, blank=True, null=True)
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db import models
-   
-class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password=None):
-        if not username:
-            raise ValueError('Users must have a username')
-        if not email:
-            raise ValueError('Users must have an email address')
+    set_role = Role.ADMIN
+    # avatar = models.ImageField(null=True, default="avatar.svg")
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
 
-        user = self.model(
-            username=username,
-            email=self.normalize_email(email),
-        )
+    def is_admin(self):
+        return self.role == self.Role.ADMIN
 
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+    def is_employee(self):
+        return self.role == self.Role.EMPLOYEE
 
-    def create_superuser(self, username, email, password):
-        user = self.create_user(
-            username=username,
-            email=email,
-            password=password,
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
+    # def is_delivery_company(self):
+    #     return self.role == self.Role.DELIVERY
 
-# class CustomUserManager(BaseUserManager):
-#        def create_user(self, email, password=None, **extra_fields):
-#            if not email:
-#                raise ValueError('The Email field must be set')
-#            email = self.normalize_email(email)
-#            user = self.model(email=email, **extra_fields)
-#            user.set_password(password)
-#            user.save(using=self._db)
-#            return user
+    def is_manager(self):
+        return self.role == self.Role.MANAGER
 
-#        def create_superuser(self, email, password=None, **extra_fields):
-#            extra_fields.setdefault('is_staff', True)
-#            extra_fields.setdefault('is_superuser', True)
+    def is_customer(self):
+        return self.role == self.Role.CUSTOMER
 
-#            if extra_fields.get('is_staff') is not True:
-#                raise ValueError('Superuser must have is_staff=True.')
-#            if extra_fields.get('is_superuser') is not True:
-#                raise ValueError('Superuser must have is_superuser=True.')
+    def is_callcentermanager(self):
+        return self.role == self.Role.CALLCENTERMANAGER
 
-#            return self.create_user(email, password=password, **extra_fields)
-   
+    def is_callCenter(self):
+        return self.role == self.Role.CALLCENTER
 
+    def is_marketing(self):
+        return self.role == self.Role.MARKETING
 
-class CustomUser(AbstractBaseUser):
-       username = models.CharField(max_length=30, unique=True)
-       email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    #    first_name = models.CharField(max_length=30)
-    #    last_name = models.CharField(max_length=30)
-       is_active = models.BooleanField(default=True)
-       is_admin = models.BooleanField(default=False)
-       is_manager= models.BooleanField(default=False)
-       is_CallCenter_manager= models.BooleanField(default=False)
-       is_marketing= models.BooleanField(default=False)
-       is_CallCenter= models.BooleanField(default=False)
-       is_patient = models.BooleanField(default=False)
-       is_doctor = models.BooleanField(default=False)
-       is_customer= models.BooleanField(default=False)
-       is_employee = models.BooleanField(default=False)
-       phone_number = models.CharField(max_length=20)
-       date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
-       last_login = models.DateTimeField(verbose_name='last_login', auto_now=True)   
-
-
-
-
-    #    USERNAME_FIELD = 'email'
-    #    REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    #    objects = CustomUserManager()
-
-    #    def __str__(self):
-    #        return self.email
-
-    #    def has_perm(self, perm, obj=None):
-    #        return True
-
-    #    def has_module_perms(self, app_label):
-    #        return True
-       objects = CustomUserManager()
-
-       USERNAME_FIELD = 'username'
-       REQUIRED_FIELDS = ['email']
-       def __str__(self):
-          return self.username
-
-       def has_perm(self, perm, obj=None):
-         return True
-
-       def has_module_perms(self, app_label):
-          return True
-
-       @property
-       def is_staff(self):
-           return self.is_admin
-   
-   
+    def is_doctor(self):
+        return self.role == self.Role.DOCTOR
     
-   
-class Admin(models.Model):
-    
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    #  avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    def __str__(self):
-         return self.user.username  
- 
- 
-
-class Employee(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete = models.CASCADE, primary_key = True)
-    def __str__(self):
-         return self.user.username  
-    
-    
-class Manager(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username   
-    
-class Customer(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-    
-class CallCenter(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-    
-    
-class Marketing(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-    
-class Doctor(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-class Patient(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-    
-class CallCenter_manager(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE,primary_key=True)
-    def __str__(self):
-         return self.user.username  
-   
-
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-# from datetime import date
-# from django.db import models
-# from django.contrib.auth.models import PermissionsMixin, AbstractUser
-# from django.contrib.auth.base_user import AbstractBaseUser
-# from django.utils.translation import ugettext_lazy as _
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-
-# from allauth.socialaccount.models import SocialAccount
-# from .manager import UserManager
+    def is_patient(self):
+        return self.role == self.Role.PATIENT
 
 
-# class User(AbstractBaseUser, PermissionsMixin):
-#     username = models.CharField(_('username'), max_length=130, unique=True)
-#     full_name = models.CharField(_('full name'), max_length=130, blank=True)
-#     email = models.EmailField(_('email id'), max_length=50, blank=True)
-#     is_staff = models.BooleanField(_('is_staff'), default=False)
-#     is_active = models.BooleanField(_('is_active'), default=True)
-#     date_joined = models.DateField(_("date_joined"), default=date.today)
-#     phone_number_verified = models.BooleanField(default=False)
-#     change_pw = models.BooleanField(default=True)
-#     phone_number = models.BigIntegerField(blank=True, null=True)
-#     country_code = models.IntegerField(blank=True, null=True)
-#     profile_picture = models.URLField(blank=True, null=True)
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if not self.role == User.Role.ADMIN:
+                self.role = self.set_role
+            return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
-#     objects = UserManager()
 
-#     USERNAME_FIELD = 'username'
-#     REQUIRED_FIELDS = ['full_name',]
+
+
+class EmployeeManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="EMPLOYEE")
+
+
+class Employee(User):
+    set_role = User.Role.EMPLOYEE
+    employees = EmployeeManager()
+
+    class Meta:
+        proxy = True
+
+
+
+# class DeliveryManager(models.Manager):
+#     def get_queryset(self, *args, **kwargs):
+#         results = super().get_queryset(*args, **kwargs)
+#         return results.filter(role="DELIVERY")
+
+
+# class Delivery(User):
+#     set_role = User.Role.DELIVERY
+#     REQUIRED_FIELDS = ['username']
+#     companies = DeliveryManager()
 
 #     class Meta:
-#         ordering = ('username',)
-#         verbose_name = _('user')
-#         verbose_name_plural = _('users')
-
-#     def get_short_name(self):
-#         return self.username
-
-
-# def save_profile(sender, instance, **kwargs):
-#     print(instance)
-#     instance.user.full_name = instance.extra_data['name']
-#     uid = instance.extra_data['id']
-#     instance.user.profile_picture = instance.get_avatar_url()
-#     instance.user.save()
-
-# post_save.connect(save_profile, sender=SocialAccount)
+#         proxy = True
     
-# class Pat(models.Model):
-#     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
-#     name = models.CharField(max_length=100)       
-#     image = models.ImageField(default='default.jpg', upload_to='Patient_pics')
+
+class managerManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="MANAGER")
 
 
-#     def __str__(self):
-#         return '{} Patient.'.format(self.user.username)
+class Manager(User):
+    set_role = User.Role.MANAGER
+    REQUIRED_FIELDS = ['username']
+    companies = managerManager()
 
-#     def save(self, *args, **kwargs):
-#         super().save(*args, **kwargs)
-
-#         img = Image.open(self.image.path)
-#         if img.width > 300 or img.height > 300:
-#             output_size = (300, 300)
-#             img.thumbnail(output_size)
-#             img.save(self.image.path)
-
-
-# def create_profile_Patient(sender, **kwarg):
-#     if kwarg['created']:
-#         Profile.objects.create(user=kwarg['instance'])
-
-
-# post_save.connect(create_profile_Patient, sender=User)    
-    
-    
-            
-# class CallCenterProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     CallCenter_id = models.IntegerField(null=True, blank=True)
-    
-# class TeacherProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     teacher_id = models.IntegerField(null=True, blank=True)
-
-
-# @receiver(post_save, sender=Teacher)
-# def create_user_profile(sender, instance, created, **kwargs):
-#     if created and instance.role == "TEACHER":
-#         CallCenterProfile.objects.create(user=instance)
-    
-    
-# from django.db import models
-# from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
-
-# class Account(AbstractBaseUser, PermissionsMixin):
-#     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-#     name = models.CharField(max_length=30)
-#     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
-#     last_login = models.DateTimeField(verbose_name='last_login', auto_now=True)
-#     is_admin = models.BooleanField(default=False)
-#     is_active = models.BooleanField(default=True)
-#     is_staff = models.BooleanField(default=False)
-#     is_superuser = models.BooleanField(default=False)
-
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = ['name']
-#     objects = MyAccountManager()
-
-#     def __str__(self):
-#         return self.email
+    class Meta:
+        proxy = True
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-# class User(AbstractUser):
-#     is_student = models.BooleanField('student status', default=False)
-#     is_teacher = models.BooleanField('teacher status', default=False)
-    
-    
-# class User(AbstractUser):
-#   USER_TYPE_CHOICES = (
-#       (1, 'student'),
-#       (2, 'teacher'),
-#       (3, 'secretary'),
-#       (4, 'supervisor'),
-#       (5, 'admin'),
-#   )
-
-#   user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES)
-
-# class Role(models.Model):
-#   '''
-#   The Role entries are managed by the system,
-#   automatically created via a Django data migration.
-#   '''
-#   STUDENT = 1
-#   TEACHER = 2
-#   SECRETARY = 3
-#   SUPERVISOR = 4
-#   ADMIN = 5
-#   ROLE_CHOICES = (
-#       (STUDENT, 'student'),
-#       (TEACHER, 'teacher'),
-#       (SECRETARY, 'secretary'),
-#       (SUPERVISOR, 'supervisor'),
-#       (ADMIN, 'admin'),
-#   )
-
-#   id = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, primary_key=True)
-
-#   def __str__(self):
-#       return self.get_id_display()
+class CustomerManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="CUSTOMER")
 
 
-# class User(AbstractUser):
-#   roles = models.ManyToManyField(Role)
+class Customer(User):
+    set_role = User.Role.CUSTOMER
+    REQUIRED_FIELDS = ['username']
+    companies = CustomerManager()
+
+    class Meta:
+        proxy = True
+
+        
+class CallCenterManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="CALLCENTER")
 
 
+class CallCenter(User):
+    set_role = User.Role.CALLCENTER
+    REQUIRED_FIELDS = ['username']
+    companies = CallCenterManager()
+
+    class Meta:
+        proxy = True
+  
+class MarketingManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="MARKETING")
 
 
+class Marketing(User):
+    set_role = User.Role.MARKETING
+    REQUIRED_FIELDS = ['username']
+    companies = MarketingManager()
+
+    class Meta:
+        proxy = True
+
+class DoctorManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="DOCTOR")
+
+
+class Doctor(User):
+    set_role = User.Role.DOCTOR
+    REQUIRED_FIELDS = ['username']
+    companies = DoctorManager()
+
+    class Meta:
+        proxy = True
+  
+class PatientManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="PATIENT")
+
+
+class Patient(User):
+    set_role = User.Role.PATIENT
+    REQUIRED_FIELDS = ['username']
+    companies = PatientManager()
+
+    class Meta:
+        proxy = True    
+        
+class CallcentermanagerManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role="CALLCENTERMANAGER")
+
+
+class Callcentermanager(User):
+    set_role = User.Role.CALLCENTERMANAGER
+    REQUIRED_FIELDS = ['username']
+    companies = CallcentermanagerManager()
+
+    class Meta:
+        proxy = True    
+        
+      
